@@ -2,7 +2,7 @@
 import RegistrationLayout from "@/layouts/RegistrationLayout";
 import axios from "@/axios";
 import styled from 'styled-components';
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import Link from "next/link";
 
 const Form = styled.form`
@@ -73,8 +73,8 @@ export default function SignUp() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
-  const submitHandler = async (e) => {
-    e.preventDefault();
+  const submitHandler = async (event: FormEvent) => {
+    event.preventDefault();
     const res = await axios.post('/auth/signin', {
       email,
       password

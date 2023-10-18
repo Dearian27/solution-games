@@ -4,7 +4,7 @@ import styles from './page.module.css'
 import GamesLayout from '@/layouts/GamesLayout'
 import styled, { keyframes } from 'styled-components'
 import { useRouter } from 'next/navigation'
-import { ChangeEvent, useRef, useState } from 'react'
+import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react'
 
 const GradientAnimation = keyframes`
   0% {
@@ -59,11 +59,13 @@ export default function Games() {
   const handleGoHome = () => {
     router.push('/');
   }
-  const inputs: Array<HTMLInputElement | null> = [];
-  for(let i = 0; i < 6; i++) {
-    const ref = useRef<HTMLInputElement | null>(null);
-    inputs.push(ref);
-  }
+
+  const [currentRef, setCurrentRef] = useState<number>(0);
+  const inputs = useRef<HTMLInputElement[]>([]);
+  const addToRefs = useCallback((el: HTMLInputElement | null, index: number) => {
+      if (!el || inputs.current.includes(el)) return;
+      inputs.current.splice(index, 0, el);
+  }, []);
   const [values, setValues] = useState<string[]>(Array(6).fill(''));
 
   const handleInputChange = (index: number, value: string) => {
@@ -72,18 +74,50 @@ export default function Games() {
       newValues[index] = value;
 
       if(value === '') {
-        inputs[index].current!.value = newValues[index];
-        if(index !== 0) {
-          inputs[index - 1].current!.focus();
-        }
+        // console.log(inputs)
+        console.log(inputs.current);
+        inputs.current[index]!.value = newValues[index];
+        // if(index !== 0) {
+        //   inputs.current[index - 1]!.focus();
+        // }
       } else if(index < 5) {
-        inputs[index].current!.value = newValues[index];
-        inputs[index + 1].current!.focus();
+        inputs.current[index]!.value = newValues[index];
+        inputs.current[index + 1]!.focus();
       }
 
       return newValues;
     });
   };
+
+  const backSpace = (event: KeyboardEvent, index: number) => {
+    if(event.key === 'Backspace') {
+      if(inputs.current[index]?.value === '') {
+        // inputs.current[index-1]?.value = '';
+        console.log(index-1);
+        inputs.current[index-1]!.focus();
+      }
+    }
+  }
+  
+  const handlePaste = (e: ClipboardEvent) => {
+    e.preventDefault();
+    const clipboardData = e.clipboardData;
+    const pastedData = clipboardData.getData('Text');
+    const parsedData = pastedData.split('');
+    
+    inputs.current.forEach((input, index) => {
+      if(pastedData[index]) {
+        input.value = parsedData[index]; 
+      } else {
+        return;
+      }
+    })
+  }
+
+  useEffect(() => {
+    console.log(inputs);
+    console.log(currentRef);
+  },[inputs, currentRef])
 
   return (
     <GamesLayout>
@@ -92,12 +126,17 @@ export default function Games() {
       </Header>
       <Section>
         <InputField>
-          {inputs.map((inputRef, index) => (
+        {/* {inputs.current.map((_, index) => ( */}
+          {Array(6).fill(null).map((_, index) => (
           <CodeInput
             key={index}
-            ref={inputRef}
+            ref={(el) => {
+              addToRefs(el, index);
+            }}
             value={values[index]}
-            onChange={e => handleInputChange(index, e.target.value)}
+            onKeyDown={e => backSpace(e, index)}
+            onChange={e => {handleInputChange(index, e.target.value)}}
+            onPaste={(e) => handlePaste(e)}
             maxLength={1}
           />
         ))}

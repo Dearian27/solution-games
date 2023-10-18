@@ -1,6 +1,6 @@
 'use client'
 import styled from 'styled-components';
-import FlappyBG from './flappy.png';
+import FlappyBG from '@/assets/flappy-bob.png';
 import Image from 'next/image';
 
 const Container = styled.aside`
