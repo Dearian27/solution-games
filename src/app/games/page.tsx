@@ -89,7 +89,7 @@ export default function Games() {
     });
   };
 
-  const backSpace = (event: KeyboardEvent, index: number) => {
+  const backSpace = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if(event.key === 'Backspace') {
       if(inputs.current[index]?.value === '') {
         // inputs.current[index-1]?.value = '';
@@ -99,9 +99,12 @@ export default function Games() {
     }
   }
   
-  const handlePaste = (e: ClipboardEvent) => {
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     e.preventDefault();
     const clipboardData = e.clipboardData;
+    if(!clipboardData) {
+      return;
+    }
     const pastedData = clipboardData.getData('Text');
     const parsedData = pastedData.split('');
     
@@ -134,9 +137,9 @@ export default function Games() {
               addToRefs(el, index);
             }}
             value={values[index]}
-            onKeyDown={e => backSpace(e, index)}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>)  => backSpace(e, index)}
             onChange={e => {handleInputChange(index, e.target.value)}}
-            onPaste={(e) => handlePaste(e)}
+            onPaste={(e: React.ClipboardEvent<HTMLInputElement>) => handlePaste(e)}
             maxLength={1}
           />
         ))}
