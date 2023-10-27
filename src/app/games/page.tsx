@@ -1,58 +1,9 @@
 'use client'
 import Image from 'next/image'
-import styles from './page.module.css'
+import styles from './styles.module.scss'
 import GamesLayout from '@/layouts/GamesLayout'
-import styled, { keyframes } from 'styled-components'
 import { useRouter } from 'next/navigation'
 import React, { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react'
-
-const GradientAnimation = keyframes`
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 100% 50%;
-  }
-`;
-
-const Header = styled.header`
-  box-sizing: border-box;
-  width: 100%;
-`
-
-const Section = styled.section`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(45deg, #99ff3a, #34e89e, #fff70f);
-  background-size: 200% 200%;
-  animation: ${GradientAnimation} 20s infinite alternate;
-`
-const InputField = styled.div`
-  padding: 40px;
-  font-size: 30px;
-  border-radius: 20px;
-  background-color: white;
-  border: none;
-  display: flex;
-  gap: 10px;
-`
-const CodeInput = styled.input`
-  /* padding: 10px 10px; */
-  font-size: 28px;
-  border: none;
-  outline: none;
-  width: 60px;
-  height: 70px;
-  border: 3px solid #cccccc;
-  border-radius: 10px;
-  text-align: center;
-  
-  &.active {
-    border-color: black;
-  }
-`
 
 export default function Games() {
   const router = useRouter();
@@ -74,12 +25,7 @@ export default function Games() {
       newValues[index] = value;
 
       if(value === '') {
-        // console.log(inputs)
-        console.log(inputs.current);
         inputs.current[index]!.value = newValues[index];
-        // if(index !== 0) {
-        //   inputs.current[index - 1]!.focus();
-        // }
       } else if(index < 5) {
         inputs.current[index]!.value = newValues[index];
         inputs.current[index + 1]!.focus();
@@ -92,9 +38,9 @@ export default function Games() {
   const backSpace = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {
     if(event.key === 'Backspace') {
       if(inputs.current[index]?.value === '') {
-        // inputs.current[index-1]?.value = '';
-        console.log(index-1);
-        inputs.current[index-1]!.focus();
+        if(index !== 0) {
+          inputs.current[index-1]!.focus();
+        }
       }
     }
   }
@@ -117,21 +63,16 @@ export default function Games() {
     })
   }
 
-  useEffect(() => {
-    console.log(inputs);
-    console.log(currentRef);
-  },[inputs, currentRef])
-
   return (
     <GamesLayout>
-      <Header>
+      <header className={styles.header}>
         header
-      </Header>
-      <Section>
-        <InputField>
-        {/* {inputs.current.map((_, index) => ( */}
+      </header>
+      <section className={styles.section}>
+        <div className={styles.inputField}>
           {Array(6).fill(null).map((_, index) => (
-          <CodeInput
+          <input 
+            className={styles.codeInput}
             key={index}
             ref={(el) => {
               addToRefs(el, index);
@@ -143,8 +84,8 @@ export default function Games() {
             maxLength={1}
           />
         ))}
-        </InputField>
-      </Section>
+        </div>
+      </section>
     </GamesLayout>
   )
 }
